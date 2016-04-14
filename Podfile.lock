@@ -1,0 +1,15 @@
+PODS:
+  - Mantle (2.0.6):
+    - Mantle/extobjc (= 2.0.6)
+  - Mantle/extobjc (2.0.6)
+  - UIView+Positioning (1.1)
+
+DEPENDENCIES:
+  - Mantle (~> 2.0.6)
+  - UIView+Positioning (~> 1.1)
+
+SPEC CHECKSUMS:
+  Mantle: 299966b00759634931699f69cb6a30b9239b944d
+  UIView+Positioning: e93fe9e3186d1ed7d60e344aa12787911e902056
+
+COCOAPODS: 0.39.0
