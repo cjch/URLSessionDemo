@@ -7,13 +7,15 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "TrackCell.h"
 
 typedef void (^DataCallBack)(id results, BOOL isSuccess);
 
-@interface DataRequestManager : NSObject
+@interface DataRequestManager : NSObject <TrackCellDelegate>
 
 + (instancetype)getInstance;
 
 - (void)search:(NSString *)searchText callBack:(DataCallBack)callback;
+
 
 @end

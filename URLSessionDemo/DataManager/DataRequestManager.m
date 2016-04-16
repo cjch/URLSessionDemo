@@ -9,11 +9,15 @@
 #import "DataRequestManager.h"
 #import "TrackEntity.h"
 #import <UIKit/UIkit.h>
+#import "Download.h"
 
-@interface DataRequestManager ()
+@interface DataRequestManager () <NSURLSessionDownloadDelegate>
 
+@property (nonatomic, strong) NSURLSession *downloadSession;
 @property (nonatomic, strong) NSURLSession *defaultSession;
 @property (nonatomic, strong) NSURLSessionDataTask *searchTask;
+
+@property (nonatomic, strong) NSMutableDictionary *activeDownloads;
 
 @end
 
@@ -58,6 +62,69 @@
     }];
     
     [self.searchTask resume];
+}
+
+#pragma mark - TrackCellDelegate
+- (void)trackCellDownload:(TrackCell *)cell {
+    NSString *urlStr = cell.entity.previewUrl;
+    NSURL *url = [NSURL URLWithString:urlStr];
+    Download *download = [Download downloadWithUrl:urlStr];
+    download.downloadTask = [self.downloadSession downloadTaskWithURL:url];
+    [download.downloadTask resume];
+    download.isDownloading = YES;
+    self.activeDownloads[urlStr] = download;
+}
+
+#pragma mark - NSURLSessionDownloadDelegate
+- (void)URLSession:(NSURLSession *)session downloadTask:(NSURLSessionDownloadTask *)downloadTask didFinishDownloadingToURL:(NSURL *)location {
+    NSURL *url = downloadTask.originalRequest.URL;
+    NSURL *destPath = [self localFilePathForUrl:url];
+    NSLog(@"dest: %@", destPath);
+    NSFileManager *fm = [NSFileManager defaultManager];
+    @try {
+        [fm removeItemAtURL:destPath error:nil];
+    } @catch (NSException *exception) {
+        NSLog(@"remove path error");
+    }
+    
+    @try {
+        [fm copyItemAtURL:location toURL:destPath error:nil];
+    } @catch (NSException *exception) {
+        NSLog(@"copy file error");
+    }
+    self.activeDownloads[url.absoluteString] = nil;
+}
+
+- (void)URLSession:(NSURLSession *)session downloadTask:(NSURLSessionDownloadTask *)downloadTask didWriteData:(int64_t)bytesWritten totalBytesWritten:(int64_t)totalBytesWritten totalBytesExpectedToWrite:(int64_t)totalBytesExpectedToWrite {
+    NSURL *url = downloadTask.originalRequest.URL;
+    Download *download = self.activeDownloads[url.absoluteString];
+    if (download) {
+        download.progress = bytesWritten / (float)totalBytesExpectedToWrite;
+        download.totalSize = totalBytesExpectedToWrite;
+    }
+}
+
+#pragma mark - helper
+- (NSURL *)localFilePathForUrl:(NSURL *)url {
+    NSString *documentPath = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, true) firstObject];
+    NSString *lastComponent = url.lastPathComponent;
+    NSString *localPath = [documentPath stringByAppendingPathComponent:lastComponent];
+    return [NSURL URLWithString:localPath];
+}
+
+#pragma mark - getter
+- (NSMutableDictionary *)activeDownloads {
+    if (!_activeDownloads) {
+        _activeDownloads = [[NSMutableDictionary alloc] init];
+    }
+    return _activeDownloads;
+}
+
+- (NSURLSession *)downloadSession {
+    if (!_downloadSession) {
+        _downloadSession = [NSURLSession sessionWithConfiguration:[NSURLSessionConfiguration defaultSessionConfiguration] delegate:self delegateQueue:nil];
+    }
+    return _downloadSession;
 }
 
 @end

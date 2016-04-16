@@ -11,6 +11,7 @@
 		22E3A0111CC0C2C600B511C3 /* TrackEntity.m in Sources */ = {isa = PBXBuildFile; fileRef = 22E3A0101CC0C2C600B511C3 /* TrackEntity.m */; };
 		22E3A0171CC0C80100B511C3 /* TrackCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 22E3A0161CC0C80100B511C3 /* TrackCell.m */; };
 		B6E42D3845F6C4E1533611E4 /* libPods.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F9F602290A2885513A1F7ED9 /* libPods.a */; };
+		F557F18F1CC25A340081FD99 /* Download.m in Sources */ = {isa = PBXBuildFile; fileRef = F557F18E1CC25A340081FD99 /* Download.m */; };
 		F55D56981CBFC3370070362B /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = F55D56971CBFC3370070362B /* main.m */; };
 		F55D569B1CBFC3370070362B /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = F55D569A1CBFC3370070362B /* AppDelegate.m */; };
 		F55D569E1CBFC3370070362B /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = F55D569D1CBFC3370070362B /* ViewController.m */; };
@@ -45,6 +46,8 @@
 		22E3A0151CC0C80100B511C3 /* TrackCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TrackCell.h; sourceTree = "<group>"; };
 		22E3A0161CC0C80100B511C3 /* TrackCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TrackCell.m; sourceTree = "<group>"; };
 		884AB8C416557072AF658E0B /* Pods.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Pods.release.xcconfig; path = "Pods/Target Support Files/Pods/Pods.release.xcconfig"; sourceTree = "<group>"; };
+		F557F18D1CC25A340081FD99 /* Download.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Download.h; sourceTree = "<group>"; };
+		F557F18E1CC25A340081FD99 /* Download.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Download.m; sourceTree = "<group>"; };
 		F55D56931CBFC3370070362B /* URLSessionDemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = URLSessionDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		F55D56971CBFC3370070362B /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		F55D56991CBFC3370070362B /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
@@ -93,6 +96,8 @@
 				22E3A00D1CC0C1B000B511C3 /* DataRequestManager.m */,
 				22E3A00F1CC0C2C600B511C3 /* TrackEntity.h */,
 				22E3A0101CC0C2C600B511C3 /* TrackEntity.m */,
+				F557F18D1CC25A340081FD99 /* Download.h */,
+				F557F18E1CC25A340081FD99 /* Download.m */,
 			);
 			path = DataManager;
 			sourceTree = "<group>";
@@ -173,6 +178,7 @@
 				F55D56901CBFC3370070362B /* Frameworks */,
 				F55D56911CBFC3370070362B /* Resources */,
 				D3A1410A7F4C3C88D42DA5F5 /* Copy Pods Resources */,
+				CFBCF38C4C25184973026FAC /* Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -304,6 +310,21 @@
 			shellScript = "diff \"${PODS_ROOT}/../Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [[ $? != 0 ]] ; then\n    cat << EOM\nerror: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\nEOM\n    exit 1\nfi\n";
 			showEnvVarsInLog = 0;
 		};
+		CFBCF38C4C25184973026FAC /* Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Embed Pods Frameworks";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods/Pods-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
 		D3A1410A7F4C3C88D42DA5F5 /* Copy Pods Resources */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -331,6 +352,7 @@
 				22E3A0111CC0C2C600B511C3 /* TrackEntity.m in Sources */,
 				F55D569B1CBFC3370070362B /* AppDelegate.m in Sources */,
 				F55D56981CBFC3370070362B /* main.m in Sources */,
+				F557F18F1CC25A340081FD99 /* Download.m in Sources */,
 				22E3A0171CC0C80100B511C3 /* TrackCell.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
