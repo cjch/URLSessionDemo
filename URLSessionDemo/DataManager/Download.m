@@ -7,6 +7,7 @@
 //
 
 #import "Download.h"
+#import "TrackCell.h"
 
 @implementation Download
 
@@ -15,5 +16,13 @@
     download.url = url;
     return download;
 }
+
+- (void)refreshCell {
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self.cell setDownload:self];
+    });
+}
+
+
 
 @end

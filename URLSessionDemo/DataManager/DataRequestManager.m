@@ -46,22 +46,44 @@
             [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
         });
         
-        NSError *jError;
-        id jsonObject = [NSJSONSerialization JSONObjectWithData:data options:0 error:&jError];
-        if (!error && jsonObject) {
-            NSError *dError;
-            TrackResultsEntity *results = [[TrackResultsEntity alloc] initWithDictionary:jsonObject error:&dError];
-            if (results) {
-                callback(results, YES);
+        if (data) {
+            NSError *jError;
+            id jsonObject = [NSJSONSerialization JSONObjectWithData:data options:0 error:&jError];
+            if (!error && jsonObject) {
+                NSError *dError;
+                TrackResultsEntity *results = [[TrackResultsEntity alloc] initWithDictionary:jsonObject error:&dError];
+                if (results) {
+                    callback(results, YES);
+                } else {
+                    callback(nil, NO);
+                }
             } else {
                 callback(nil, NO);
             }
         } else {
+            NSLog(@"search failed");
             callback(nil, NO);
         }
+        
     }];
     
     [self.searchTask resume];
+}
+
+- (BOOL)urlIsDownload:(NSString *)url {
+    NSURL *localPath = [self localFilePathForUrl:[NSURL URLWithString:url]];
+    NSFileManager *fm = [NSFileManager defaultManager];
+    return [fm fileExistsAtPath:localPath.path];
+}
+
+- (Download *)downloadWithUrl:(NSString *)url {
+    if ([self urlIsDownload:url]) {
+        Download *download = [Download downloadWithUrl:url];
+        download.status = DownloadStatusFinished;
+        return download;
+    } else {
+        return self.activeDownloads[url];
+    }
 }
 
 #pragma mark - TrackCellDelegate
@@ -71,8 +93,44 @@
     Download *download = [Download downloadWithUrl:urlStr];
     download.downloadTask = [self.downloadSession downloadTaskWithURL:url];
     [download.downloadTask resume];
-    download.isDownloading = YES;
+    download.cell = cell;
+    download.status = DownloadStatusDownloading;
     self.activeDownloads[urlStr] = download;
+    
+    [download refreshCell];
+}
+
+- (void)trackCellPause:(TrackCell *)cell {
+    Download *download = cell.download;
+    [download.downloadTask cancelByProducingResumeData:^(NSData * _Nullable resumeData) {
+        if (resumeData) {
+            download.resumeData = resumeData;
+        }
+    }];
+    download.status = DownloadStatusPause;
+    
+    [download refreshCell];
+}
+
+- (void)trackCellResume:(TrackCell *)cell {
+    Download *download = cell.download;
+    if (download.resumeData) {
+        download.downloadTask = [self.downloadSession downloadTaskWithResumeData:download.resumeData];
+    } else {
+        download.downloadTask = [self.downloadSession downloadTaskWithURL:[NSURL URLWithString:download.url]];
+    }
+    [download.downloadTask resume];
+    download.status = DownloadStatusDownloading;
+    [download refreshCell];
+}
+
+- (void)trackCellCancel:(TrackCell *)cell {
+    Download *download = cell.download;
+    [download.downloadTask cancel];
+    download.status = DownloadStatusReady;
+    self.activeDownloads[download.url] = nil;
+    
+    [download refreshCell];
 }
 
 #pragma mark - NSURLSessionDownloadDelegate
@@ -92,6 +150,12 @@
     } @catch (NSException *exception) {
         NSLog(@"copy file error");
     }
+    
+    Download *download = self.activeDownloads[url.absoluteString];
+    download.status = DownloadStatusFinished;
+    download.localPath = destPath.path;
+    [download refreshCell];
+    
     self.activeDownloads[url.absoluteString] = nil;
 }
 
@@ -99,8 +163,12 @@
     NSURL *url = downloadTask.originalRequest.URL;
     Download *download = self.activeDownloads[url.absoluteString];
     if (download) {
-        download.progress = bytesWritten / (float)totalBytesExpectedToWrite;
+        download.progress = totalBytesWritten / (float)totalBytesExpectedToWrite;
         download.totalSize = totalBytesExpectedToWrite;
+        
+        NSLog(@"session %@, task %@ download progress: %f", session, downloadTask, download.progress);
+        
+        [download refreshCell];
     }
 }
 
@@ -109,7 +177,7 @@
     NSString *documentPath = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, true) firstObject];
     NSString *lastComponent = url.lastPathComponent;
     NSString *localPath = [documentPath stringByAppendingPathComponent:lastComponent];
-    return [NSURL URLWithString:localPath];
+    return [NSURL fileURLWithPath:localPath];
 }
 
 #pragma mark - getter

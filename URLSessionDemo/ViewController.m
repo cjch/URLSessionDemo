@@ -68,7 +68,9 @@
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     TrackCell *cell = [tableView dequeueReusableCellWithIdentifier:@"TrackCell" forIndexPath:indexPath];
     cell.delegate = self.manager;
-    cell.entity = self.dataArray[indexPath.row];
+    TrackEntity *entity = self.dataArray[indexPath.row];
+    cell.entity = entity;
+    cell.download = [self.manager downloadWithUrl:entity.previewUrl];
     cell.selectionStyle = UITableViewCellSelectionStyleNone;
     return cell;
 }

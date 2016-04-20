@@ -7,18 +7,28 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "TrackCell.h"
+
+typedef NS_ENUM(NSInteger, DownloadStatus) {
+    DownloadStatusReady = 0,
+    DownloadStatusDownloading,
+    DownloadStatusPause,
+    DownloadStatusFinished
+};
+
+@class TrackCell;
 
 @interface Download : NSObject
 
 @property (nonatomic, weak) TrackCell *cell;
+@property (nonatomic, assign) DownloadStatus status;
+@property (nonatomic, strong) NSString *localPath;
 @property (nonatomic, copy) NSString *url;
-@property (nonatomic, assign) BOOL isDownloading;
 @property (nonatomic, assign) float progress;
 @property (nonatomic, assign) long totalSize;
 @property (nonatomic, strong) NSURLSessionDownloadTask *downloadTask;
 @property (nonatomic, strong) NSData *resumeData;
 
 + (instancetype)downloadWithUrl:(NSString *)url;
+- (void)refreshCell;
 
 @end

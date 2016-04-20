@@ -16,6 +16,7 @@ typedef void (^DataCallBack)(id results, BOOL isSuccess);
 + (instancetype)getInstance;
 
 - (void)search:(NSString *)searchText callBack:(DataCallBack)callback;
-
+- (BOOL)urlIsDownload:(NSString *)url;
+- (Download *)downloadWithUrl:(NSString *)url;
 
 @end
