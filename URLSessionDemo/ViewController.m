@@ -9,6 +9,7 @@
 #import "ViewController.h"
 #import "TrackCell.h"
 #import "DataRequestManager.h"
+#import <MediaPlayer/MediaPlayer.h>
 
 @interface ViewController () <UISearchBarDelegate, UITableViewDelegate, UITableViewDataSource>
 
@@ -77,6 +78,11 @@
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     [tableView deselectRowAtIndexPath:indexPath animated:YES];
+    TrackCell *cell = [tableView cellForRowAtIndexPath:indexPath];
+    if (cell.download.status == DownloadStatusFinished) {
+        MPMoviePlayerViewController *playerVC = [[MPMoviePlayerViewController alloc] initWithContentURL:[NSURL fileURLWithPath:cell.download.localPath]];
+        [self presentViewController:playerVC animated:YES completion:nil];
+    }
 }
 
 #pragma mark - Helper
