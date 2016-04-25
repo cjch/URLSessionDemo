@@ -10,6 +10,7 @@
 #import "TrackEntity.h"
 #import <UIKit/UIkit.h>
 #import "Download.h"
+#import "AppDelegate.h"
 
 @interface DataRequestManager () <NSURLSessionDownloadDelegate>
 
@@ -134,6 +135,17 @@
 }
 
 #pragma mark - NSURLSessionDownloadDelegate
+- (void)URLSessionDidFinishEventsForBackgroundURLSession:(NSURLSession *)session {
+    void (^completeHandler)() = [AppDelegate getInstance].bgCompleteHandlerDict[session.configuration.identifier];
+    [AppDelegate getInstance].bgCompleteHandlerDict[session.configuration.identifier] = nil;
+    if (completeHandler) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            NSLog(@"call complete handler");
+            completeHandler();
+        });
+    }
+}
+
 - (void)URLSession:(NSURLSession *)session downloadTask:(NSURLSessionDownloadTask *)downloadTask didFinishDownloadingToURL:(NSURL *)location {
     NSURL *url = downloadTask.originalRequest.URL;
     NSURL *destPath = [self localFilePathForUrl:url];
@@ -190,7 +202,7 @@
 
 - (NSURLSession *)downloadSession {
     if (!_downloadSession) {
-        _downloadSession = [NSURLSession sessionWithConfiguration:[NSURLSessionConfiguration defaultSessionConfiguration] delegate:self delegateQueue:nil];
+        _downloadSession = [NSURLSession sessionWithConfiguration:[NSURLSessionConfiguration backgroundSessionConfigurationWithIdentifier:@"bgSession"] delegate:self delegateQueue:nil];
     }
     return _downloadSession;
 }

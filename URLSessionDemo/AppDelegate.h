@@ -12,6 +12,8 @@
 
 @property (strong, nonatomic) UIWindow *window;
 
+@property (nonatomic, strong) NSMutableDictionary *bgCompleteHandlerDict;
++ (instancetype)getInstance;
 
 @end
 
