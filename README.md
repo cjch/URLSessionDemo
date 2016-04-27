@@ -1,5 +1,7 @@
 # URLSessionDemo
 
+在iOS7之前，网络请求和下载数据使用NSURLConnection。在iOS7之后应使用NSURLSession实现数据的请求和上传。
+
 ##NSURLSession
 ###type (NSURLSessionConfiguration)
 - default
@@ -40,7 +42,7 @@ NSURLSessionDataTask *task = [session dataTaskWithUrl:url];
 ```
 
 ###Background Session
-用户强制关闭程序，后台session会断掉。程序运行在后台时，
+用户强制关闭程序，后台session会断掉。
 
 ```objective-c
 /// session delegate file
@@ -76,6 +78,26 @@ NSURLSession *bgSession = [NSURLSession sessionWithConfiguration:[NSURLSessionCo
     }
     self.bgCompleteHandlerDict[identifier] = completionHandler;
 }
+
+```
+
+##Encode URL Data
+```objective-c
+// encode
+CFStringRef originalString = ...
+CFStringRef encodedString = CFURLCreateStringByAddingPercentEscapes(
+    kCFAllocatorDefault,
+    originalString,
+    NULL,
+    CFSTR(":/?#[]@!$&'()*+,;="),
+    kCFStringEncodingUTF8);
+    
+// decode: must split URL before decode
+CFStringRef decodedString = CFURLCreateStringByReplacingPercentEscapesUsingEncoding(
+    kCFAllocatorDefault,
+    encodedString,
+    CFSTR(""),
+    kCFStringEncodingUTF8);
 
 ```
 
